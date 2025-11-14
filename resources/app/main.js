@@ -172,7 +172,50 @@ class BotyProMain {
             const results = [];
             const totalMessages = selectedGroups.length * cycles;
             let progress = 0;
-            
+
+            const shuffleArray = (items) => {
+                const array = items.slice();
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            };
+
+            const hasUniqueMessages = new Set(messages).size > 1;
+
+            let messageOrder = shuffleArray(messages);
+            let messageIndex = 0;
+            let lastMessageSent = null;
+
+            const getNextMessage = () => {
+                if (!hasUniqueMessages) {
+                    lastMessageSent = messages[0];
+                    return messages[0];
+                }
+
+                if (messageIndex >= messageOrder.length) {
+                    messageOrder = shuffleArray(messages);
+                    messageIndex = 0;
+
+                    if (messageOrder[0] === lastMessageSent) {
+                        const swapIndex = messageOrder.findIndex(msg => msg !== lastMessageSent);
+                        if (swapIndex > 0) {
+                            [messageOrder[0], messageOrder[swapIndex]] = [messageOrder[swapIndex], messageOrder[0]];
+                        }
+                    }
+                }
+
+                let nextMessage = messageOrder[messageIndex++];
+
+                if (nextMessage === lastMessageSent) {
+                    return getNextMessage();
+                }
+
+                lastMessageSent = nextMessage;
+                return nextMessage;
+            };
+
             for (let cycle = 0; cycle < cycles; cycle++) {
                 for (const groupName of selectedGroups) {
                     const groupEntity = this.groupEntityMap.get(groupName);
@@ -180,10 +223,9 @@ class BotyProMain {
                         progress++;
                         continue;
                     }
-                    
-                    // Randomly pick one message from the available messages
-                    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-                    
+
+                    const randomMessage = getNextMessage();
+
                     try {
                         await this.client.sendMessage(groupEntity, { message: randomMessage });
                         results.push({ success: true, group: groupName, message: randomMessage.substring(0, 50) });
