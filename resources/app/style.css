@@ -174,7 +174,7 @@ body {
     font-weight: 500;
 }
 
-input[type="text"], input[type="number"], textarea {
+input[type="text"], input[type="number"], textarea, select {
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
@@ -185,7 +185,7 @@ input[type="text"], input[type="number"], textarea {
     transition: all 0.3s ease;
 }
 
-input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
+input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
     outline: none;
     border: 2px solid #667eea;
     background: rgba(255, 255, 255, 0.08);
