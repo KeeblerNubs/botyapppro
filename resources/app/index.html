@@ -118,9 +118,36 @@
             <!-- AI Tab -->
             <div id="ai-tab" class="tab-pane">
                 <div class="section-group">
-                    <h2 class="section-title">🤖 AI Features</h2>
-                    <div class="placeholder">
-                        <p>🤖 AI features coming soon!</p>
+                    <h2 class="section-title">🤖 AI Promo Generator</h2>
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="promo-room-select">🏟️ Choose a room</label>
+                            <select id="promo-room-select">
+                                <option value="">Select a room...</option>
+                                <option value="VIP Room">VIP Room</option>
+                                <option value="PRIME">PRIME</option>
+                                <option value="The Locker Room">The Locker Room</option>
+                                <option value="PUPCulture">PUPCulture</option>
+                                <option value="Mo Mo Mo">Mo Mo Mo</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="promo-tone">✨ Promo vibe</label>
+                            <select id="promo-tone">
+                                <option value="enthusiastic">Enthusiastic</option>
+                                <option value="exclusive">Exclusive</option>
+                                <option value="friendly">Friendly</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button id="generate-promo-btn" class="btn-primary">🤖 Generate Promo</button>
+                        <button id="apply-promo-btn" class="btn-secondary">📨 Add to Template 1</button>
+                    </div>
+                    <div class="input-group">
+                        <label for="promo-output">📝 AI-crafted promo message</label>
+                        <textarea id="promo-output" class="message-template" rows="4" placeholder="Generated promo message will appear here..."></textarea>
                     </div>
                 </div>
             </div>

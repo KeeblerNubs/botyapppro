@@ -7,7 +7,35 @@ class BotyProRenderer {
         this.stopRequested = false;
         this.config = {};
         this.isConnected = false;
-        
+
+        this.roomPromos = {
+            'VIP Room': [
+                'Step into the VIP Room for premium picks, priority alerts, and concierge-level support tailored to winners.',
+                'VIP Room is rolling out red-carpet calls—exclusive plays, private chat vibes, and first dibs on every drop.',
+                'Unlock the velvet rope: VIP Room members get elite insights, early drops, and one-on-one guidance.'
+            ],
+            'PRIME': [
+                'Power up in PRIME—high-confidence plays, sharp analysis, and a squad that loves closing out big wins.',
+                'Join PRIME for laser-focused strategy, steady-value picks, and community energy that never cools off.',
+                'PRIME is where clutch reads meet consistent returns—lock in, level up, and ride with the crew.'
+            ],
+            'The Locker Room': [
+                'Clock in at The Locker Room for pre-game intel, teamwork energy, and game plans that turn into wins.',
+                'The Locker Room is all about strategy sessions, smart angles, and team-first support before every play.',
+                'Suit up in The Locker Room—chalk talk, film-room vibes, and actionable picks you can run with.'
+            ],
+            'PUPCulture': [
+                'Hang with PUPCulture for playful energy, bold parlays, and community vibes that keep the chat lit.',
+                'PUPCulture mixes culture and clever plays—fun banter, hype drops, and picks with serious bite.',
+                'Join PUPCulture to chase creative angles, spicy odds, and a pack that celebrates every win together.'
+            ],
+            'Mo Mo Mo': [
+                'Mo Mo Mo is momentum on repeat—ride the streaks with fast-moving plays and electric updates.',
+                'Tap into Mo Mo Mo for rapid-fire reads, confident swings, and the hype train that never slows down.',
+                'Stack momentum in Mo Mo Mo—quick hits, bold calls, and a crew that loves pushing the pace.'
+            ]
+        };
+
         this.initializeElements();
         this.setupEventListeners();
         this.setupIPCListeners();
@@ -40,6 +68,13 @@ class BotyProRenderer {
         this.startQueueBtn = document.getElementById('start-queue-btn');
         this.stopQueueBtn = document.getElementById('stop-queue-btn');
         this.clearLogBtn = document.getElementById('clear-log-btn');
+
+        // AI elements
+        this.promoRoomSelect = document.getElementById('promo-room-select');
+        this.promoToneSelect = document.getElementById('promo-tone');
+        this.generatePromoBtn = document.getElementById('generate-promo-btn');
+        this.applyPromoBtn = document.getElementById('apply-promo-btn');
+        this.promoOutput = document.getElementById('promo-output');
         
         // Other elements
         this.groupsList = document.getElementById('groups-list');
@@ -81,6 +116,10 @@ class BotyProRenderer {
         this.startQueueBtn.addEventListener('click', () => this.startMessageQueue());
         this.stopQueueBtn.addEventListener('click', () => this.stopMessageQueue());
         this.clearLogBtn.addEventListener('click', () => this.clearLog());
+
+        // AI promo events
+        this.generatePromoBtn.addEventListener('click', () => this.generatePromoMessage());
+        this.applyPromoBtn.addEventListener('click', () => this.applyPromoToTemplate());
 
         // Modal events
         this.modalCancel.addEventListener('click', () => this.hideModal(false));
@@ -399,6 +438,54 @@ class BotyProRenderer {
     clearLog() {
         this.logDisplay.innerHTML = '';
         this.log('🧹 Log cleared');
+    }
+
+    generatePromoMessage() {
+        const room = this.promoRoomSelect.value;
+        const tone = this.promoToneSelect.value || 'enthusiastic';
+
+        if (!room) {
+            this.log('❌ Please select a room to generate a promo.');
+            return;
+        }
+
+        const promos = this.roomPromos[room] || [];
+        if (promos.length === 0) {
+            this.log('❌ No promos available for the selected room.');
+            return;
+        }
+
+        const basePromo = promos[Math.floor(Math.random() * promos.length)];
+        const toneFlair = {
+            enthusiastic: '🔥',
+            exclusive: '🔒',
+            friendly: '😊',
+            urgent: '⏰'
+        }[tone];
+
+        const toneSuffix = {
+            enthusiastic: 'Let’s ride this wave together!',
+            exclusive: 'Limited spots—jump in before this window closes.',
+            friendly: 'Pull up and vibe with the crew.',
+            urgent: 'Act now so you don’t miss the next call.'
+        }[tone];
+
+        const promoMessage = `${toneFlair ? toneFlair + ' ' : ''}${basePromo} ${toneSuffix}`.trim();
+        this.promoOutput.value = promoMessage;
+        this.log(`🤖 Generated promo for ${room}.`);
+    }
+
+    applyPromoToTemplate() {
+        const promoMessage = this.promoOutput.value.trim();
+
+        if (!promoMessage) {
+            this.log('❌ Generate a promo before adding it to your templates.');
+            return;
+        }
+
+        this.templateInputs[0].value = promoMessage;
+        this.saveConfig();
+        this.log('📨 Promo added to Template 1 for quick sending.');
     }
 
     async showInputDialog(title, message, isPassword = false) {
