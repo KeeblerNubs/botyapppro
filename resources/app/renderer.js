@@ -74,6 +74,7 @@ class BotyProRenderer {
         this.promoToneSelect = document.getElementById('promo-tone');
         this.generatePromoBtn = document.getElementById('generate-promo-btn');
         this.applyPromoBtn = document.getElementById('apply-promo-btn');
+        this.autoFillTemplatesBtn = document.getElementById('auto-fill-templates-btn');
         this.promoOutput = document.getElementById('promo-output');
         
         // Other elements
@@ -120,6 +121,7 @@ class BotyProRenderer {
         // AI promo events
         this.generatePromoBtn.addEventListener('click', () => this.generatePromoMessage());
         this.applyPromoBtn.addEventListener('click', () => this.applyPromoToTemplate());
+        this.autoFillTemplatesBtn.addEventListener('click', () => this.autoFillTemplates());
 
         // Modal events
         this.modalCancel.addEventListener('click', () => this.hideModal(false));
@@ -456,6 +458,12 @@ class BotyProRenderer {
         }
 
         const basePromo = promos[Math.floor(Math.random() * promos.length)];
+        const promoMessage = this.composePromoMessage(basePromo, tone);
+        this.promoOutput.value = promoMessage;
+        this.log(`🤖 Generated promo for ${room}.`);
+    }
+
+    composePromoMessage(basePromo, tone) {
         const toneFlair = {
             enthusiastic: '🔥',
             exclusive: '🔒',
@@ -470,9 +478,40 @@ class BotyProRenderer {
             urgent: 'Act now so you don’t miss the next call.'
         }[tone];
 
-        const promoMessage = `${toneFlair ? toneFlair + ' ' : ''}${basePromo} ${toneSuffix}`.trim();
-        this.promoOutput.value = promoMessage;
-        this.log(`🤖 Generated promo for ${room}.`);
+        return `${toneFlair ? toneFlair + ' ' : ''}${basePromo} ${toneSuffix}`.trim();
+    }
+
+    autoFillTemplates() {
+        const room = this.promoRoomSelect.value;
+        const tone = this.promoToneSelect.value || 'enthusiastic';
+
+        if (!room) {
+            this.log('❌ Please select a room to auto-generate templates.');
+            return;
+        }
+
+        const promos = this.roomPromos[room] || [];
+        if (promos.length === 0) {
+            this.log('❌ No promos available for the selected room.');
+            return;
+        }
+
+        const promosPool = [...promos];
+        const templates = this.templateInputs.map(() => {
+            if (promosPool.length === 0) {
+                promosPool.push(...promos);
+            }
+            const promoIndex = Math.floor(Math.random() * promosPool.length);
+            const [basePromo] = promosPool.splice(promoIndex, 1);
+            return this.composePromoMessage(basePromo, tone);
+        });
+
+        this.templateInputs.forEach((template, index) => {
+            template.value = templates[index];
+        });
+
+        this.saveConfig();
+        this.log(`🪄 Auto-filled templates for ${room}.`);
     }
 
     applyPromoToTemplate() {
